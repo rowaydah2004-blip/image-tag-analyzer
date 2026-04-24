@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Image Tag Analyzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      background: #0078d4;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background: #005ea6;
+    }
+
+    #resetButton {
+      background: #6c757d;
+    }
+
+    #resetButton:hover {
+      background: #545b62;
+    }
+
+    #preview {
+      display: none;
+      margin-top: 20px;
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    #results {
+      margin-top: 20px;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #results li {
+      background: #e8f1fb;
+      color: #1a4f8b;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 15px;
+    }
+
+    #spinner {
+      display: none;
+      margin-top: 15px;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #ddd;
+      border-top: 4px solid #0078d4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Image Tag Analyzer</h1>
+
+    <form id="uploadForm">
+      <input type="file" id="imageInput" name="image" accept="image/*" required>
+      <br>
+      <button type="submit" id="uploadButton">Upload</button>
+      <button type="button" id="resetButton">Reset</button>
+    </form>
+
+    <img id="preview" alt="Image Preview">
+
+    <div id="status"></div>
+    <div id="spinner"></div>
+    <h3>Predicted Tags:</h3>
+    <ul id="results"></ul>
+  </div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const imageInput = document.getElementById("imageInput");
+    const results = document.getElementById("results");
+    const preview = document.getElementById("preview");
+    const status = document.getElementById("status");
+    const spinner = document.getElementById("spinner");
+    const resetButton = document.getElementById("resetButton");
+    const uploadButton = document.getElementById("uploadButton");
+
+    imageInput.addEventListener("change", function () {
+      const file = imageInput.files[0];
+
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+    });
+
+    resetButton.addEventListener("click", function () {
+      imageInput.value = "";
+      preview.src = "";
+      preview.style.display = "none";
+      status.textContent = "";
+      results.innerHTML = "";
+      spinner.style.display = "none";
+      uploadButton.disabled = false;
+      resetButton.disabled = false;
+      imageInput.disabled = false;
+    });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const file = imageInput.files[0];
+      if (!file) {
+        status.textContent = "Please choose an image first.";
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        status.textContent = "Please upload an image file only.";
+        return;
+      }
+
+      status.textContent = "Analyzing image...";
+      spinner.style.display = "block";
+      results.innerHTML = "";
+      uploadButton.disabled = true;
+      resetButton.disabled = true;
+      imageInput.disabled = true;
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const response = await fetch("http://localhost:3000/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error("Server error");
+        }
+
+        const data = await response.json();
+
+        status.textContent = "Analysis complete.";
+        spinner.style.display = "none";
+        uploadButton.disabled = false;
+        resetButton.disabled = false;
+        imageInput.disabled = false;
+
+        const uniqueTags = [];
+        const seenLabels = new Set();
+
+        data.tags.forEach(tag => {
+          if (!seenLabels.has(tag.label)) {
+            seenLabels.add(tag.label);
+            uniqueTags.push(tag);
+          }
+        });
+
+        uniqueTags.forEach(tag => {
+          const li = document.createElement("li");
+          const cleanLabel = tag.label.replaceAll("_", " ");
+          const percentage = (tag.score * 100).toFixed(1);
+          li.textContent = `${cleanLabel} (${percentage}%)`;
+          results.appendChild(li);
+        });
+      } catch (error) {
+        status.textContent = "Error uploading image.";
+        spinner.style.display = "none";
+        uploadButton.disabled = false;
+        resetButton.disabled = false;
+        imageInput.disabled = false;
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+
+</html>
