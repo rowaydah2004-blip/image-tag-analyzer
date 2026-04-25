@@ -10,10 +10,19 @@ A simple web app that uploads an image and analyzes it using a Python model.
 ## How to Run
 
 1. Install dependencies:
-npm install
+## Features
+- Upload an image
+- Analyze using AI model
+- Display predicted tags with confidence
 
-2. Run server:
+## Demo
+This project demonstrates integration between:
+- Frontend (HTML)
+- Backend (Node.js)
+- AI Model (Python + TensorFlow)
+
+3. Run server:
 node server/index.js
 
-3. Run Python script (if needed):
+4. Run Python script (if needed):
 python analyze.py
