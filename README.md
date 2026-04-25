@@ -28,5 +28,6 @@ This project demonstrates integration between:
 - Backend (Node.js)
 - AI Model (Python + TensorFlow)
 ## Screenshot
-Working example of the app:
+
+Example output after uploading an image:
 ![App Screenshot](screenshot.png)
