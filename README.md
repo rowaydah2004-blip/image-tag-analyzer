@@ -20,15 +20,11 @@ node server/index.js
 
 4. Open in browser:
 http://localhost:3000
-
 ## Demo
+
 This project demonstrates integration between:
+
 - Frontend (HTML)
 - Backend (Node.js)
 - AI Model (Python + TensorFlow)
 
-3. Run server:
-node server/index.js
-
-4. Run Python script (if needed):
-python analyze.py
