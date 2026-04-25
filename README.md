@@ -27,4 +27,6 @@ This project demonstrates integration between:
 - Frontend (HTML)
 - Backend (Node.js)
 - AI Model (Python + TensorFlow)
-
+## Screenshot
+Working example of the app:
+![App Screenshot](screenshot.png)
