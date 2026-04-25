@@ -9,11 +9,17 @@ A simple web app that uploads an image and analyzes it using a Python model.
 - TensorFlow
 ## How to Run
 
-1. Install dependencies:
-## Features
-- Upload an image
-- Analyze using AI model
-- Display predicted tags with confidence
+1. Install Node.js dependencies:
+npm install
+
+2. Install Python dependencies:
+pip install -r requirements.txt
+
+3. Run the server:
+node server/index.js
+
+4. Open in browser:
+http://localhost:3000
 
 ## Demo
 This project demonstrates integration between:
